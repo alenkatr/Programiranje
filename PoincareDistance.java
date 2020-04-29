@@ -5,6 +5,13 @@
    */
 package si.fis.unm.weka;
 
+
+/** preberi podatke - uvozi .arff file */
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 import weka.core.TechnicalInformation.Field;
 import weka.core.TechnicalInformation.Type;
 import weka.core.neighboursearch.PerformanceStats;
@@ -19,18 +26,18 @@ import weka.core.TechnicalInformationHandler;
 
 /** filtri */
 import weka.filters.Filter;
-import weka.filters.unsupervised.attribute.Remove;
+import weka.filters.unsupervised.instance.imagefilter;
+import java.awt.image.BufferedImage;
+import net.semanticmetadata.lire.imageanalysis.BinaryPatternsPyramid;
 
-/** preberi podatke - uvozi .arff file */
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-
-
+/** klasifikator */
+import weka.classifiers.lazy.IBk;
+import weka.core.WeightedInstancesHandler;
+import weka.core.neighboursearch.LinearNNSearch;
+import weka.core.neighboursearch.NearestNeighbourSearch;
 
 
-/** klasifikacija - uporaba klasifikatorja IBK */
+
 
 
 
@@ -87,7 +94,7 @@ import java.io.IOException;
  * 
  <!-- options-end --> 
  *
- * @author Alenka
+ * @author 
  * @version $Revision: 1 $
  */
 public class PoincareDistance
@@ -110,6 +117,7 @@ public class PoincareDistance
 
 
 /** uporabi filter na podatkih */
+
 
 
 
