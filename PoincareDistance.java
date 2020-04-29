@@ -116,7 +116,7 @@ newData.setAttributeIndices("1");  // odstrani prvi atribut - ime fotografije (?
     
 /** klasifikacija - uporaba klasifikatorja IBk */
 
-// for (k; k < 11; k++)
+// for (int k = 0; k < 11; k++)
 IBk knn = new IBk(1);  // (k=1) zaenkrat 
 knn.buildClassifier(newData);
 
@@ -145,7 +145,7 @@ System.out.println(eval.toClassDetailsString());
   /**
    * Constructs an Poincare Distance object, Instances must be still set.
    */
-  public PoincareDistance() {
+  public PoincareDistance()s {
     super();
   }
 
