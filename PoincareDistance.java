@@ -3,7 +3,7 @@
    * Izdelano september 2018
    * Nadgrajeno april 2020
    */
-package weka.core;
+package si.fis.unm.weka;
 
 import weka.core.TechnicalInformation.Field;
 import weka.core.TechnicalInformation.Type;
@@ -16,6 +16,35 @@ import weka.core.TechnicalInformation;
 import weka.core.DenseInstance;
 import weka.core.RevisionUtils;
 import weka.core.TechnicalInformationHandler;
+
+/** filtri */
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Remove;
+
+/** preberi podatke - uvozi .arff file */
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+
+
+
+/** klasifikacija - uporaba klasifikatorja IBK */
+
+
+
+/** razdeli podatke na testno in učno množico - uporaba 10 cross fold validation */
+
+/** izpiši rezultate 
+ * - Stratified cross-validation (tu so formalni rezultati: število pravilno in napačno razvrščenih primerkov, kappa statistika, povprečna napaka, relativna napaka, število vseh primerkov) 
+ * - Detailed Accuracy By Class (tu so natančnejši rezultati: Recall, Precision, MCC, ROC Area, PRC Area)*/
+
+
+
+
+
+
 
 /**
  <!-- globalinfo-start -->
@@ -65,7 +94,44 @@ public class PoincareDistance
   extends NormalizableDistance
   implements Cloneable, TechnicalInformationHandler {
 
-  /** for serialization. */
+  
+  
+
+
+
+    /** preberi podatke - uvozi .arff file */
+
+    public static void main(String[] args) throws Exception {
+      BufferedReader reader = new BufferedReader(new FileReader("/Documents/Slike/FRDuciMachine/VsiJPG/Zobrazi.arff"));
+      ArffReader arff = new ArffReader(reader);
+      Instances data = arff.getData();
+      data.setClassIndex(data.numAttributes() - 1);
+    }
+
+
+/** uporabi filter na podatkih */
+
+
+
+/** klasifikacija - uporaba klasifikatorja IBK */
+
+
+
+/** razdeli podatke na testno in učno množico - uporaba 10 cross fold validation */
+
+/** izpiši rezultate 
+ * - Stratified cross-validation (tu so formalni rezultati: število pravilno in napačno razvrščenih primerkov, kappa statistika, povprečna napaka, relativna napaka, število vseh primerkov) 
+ * - Detailed Accuracy By Class (tu so natančnejši rezultati: Recall, Precision, MCC, ROC Area, PRC Area)*/
+
+
+
+  
+  
+  
+  
+    
+  
+    /** for serialization. */
   private static final long serialVersionUID = -1068606253458807903L;
 //private Instances Instance0;
 
