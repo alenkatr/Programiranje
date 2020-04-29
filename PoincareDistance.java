@@ -11,6 +11,8 @@ package si.fis.unm.weka;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.Object;  //za izbiro filtra
+import java.util.Random;  // za cross validation
 
 import weka.core.TechnicalInformation.Field;
 import weka.core.TechnicalInformation.Type;
@@ -23,32 +25,18 @@ import weka.core.TechnicalInformation;
 import weka.core.DenseInstance;
 import weka.core.RevisionUtils;
 import weka.core.TechnicalInformationHandler;
+// import weka.core.*;
 
 /** filtri */
 import weka.filters.Filter;
 import weka.filters.unsupervised.instance.imagefilter;
-import java.awt.image.BufferedImage;
-import net.semanticmetadata.lire.imageanalysis.BinaryPatternsPyramid;
+//import java.awt.image.BufferedImage; IBk 
 
 /** klasifikator */
 import weka.classifiers.lazy.IBk;
 import weka.core.WeightedInstancesHandler;
 import weka.core.neighboursearch.LinearNNSearch;
 import weka.core.neighboursearch.NearestNeighbourSearch;
-
-
-
-
-
-
-/** razdeli podatke na testno in učno množico - uporaba 10 cross fold validation */
-
-/** izpiši rezultate 
- * - Stratified cross-validation (tu so formalni rezultati: število pravilno in napačno razvrščenih primerkov, kappa statistika, povprečna napaka, relativna napaka, število vseh primerkov) 
- * - Detailed Accuracy By Class (tu so natančnejši rezultati: Recall, Precision, MCC, ROC Area, PRC Area)*/
-
-
-
 
 
 
@@ -102,47 +90,58 @@ public class PoincareDistance
   implements Cloneable, TechnicalInformationHandler {
 
   
-  
-
-
-
-    /** preberi podatke - uvozi .arff file */
+      /** preberi podatke iz .arff datoteke */
 
     public static void main(String[] args) throws Exception {
-      BufferedReader reader = new BufferedReader(new FileReader("/Documents/Slike/FRDuciMachine/VsiJPG/Zobrazi.arff"));
+      BufferedReader reader = new BufferedReader(new FileReader("/Documents/Slike/FRDuciMachine/VsiJPG/Zobrazi.arff"));  //preberi iz datoteke
       ArffReader arff = new ArffReader(reader);
       Instances data = arff.getData();
-      data.setClassIndex(data.numAttributes() - 1);
-    }
+      data.setClassIndex(data.numAttributes() - 1);   // doda indeks zadnjemu atributu
+    
 
 
-/** uporabi filter na podatkih */
+/** uporabi filter na podatkih 
+ * java weka.Run imageFilters // za izbiro filtra
+*/
 
 
+BinaryPatternsPyramidFilter BPP = new BinaryPatternsPyramidFilter();                         // new instance of filter
+BPP.setOptions(options);                           // set options// za cross validation
 
 
-/** klasifikacija - uporaba klasifikatorja IBK */
+Remove newData = new Remove();
+newData.setAttributeIndices("1");  // odstrani prvi atribut - ime fotografije (?)
 
 
+    
+/** klasifikacija - uporaba klasifikatorja IBk */
+
+// for (k; k < 11; k++)
+IBk knn = new IBk(1);  // (k=1) zaenkrat 
+knn.buildClassifier(newData);
 
 /** razdeli podatke na testno in učno množico - uporaba 10 cross fold validation */
+
+Evaluation eval = new Evaluation(newData);
+eval.crossValidateModel(knn, newData, 10 , new Random(1));
+
 
 /** izpiši rezultate 
  * - Stratified cross-validation (tu so formalni rezultati: število pravilno in napačno razvrščenih primerkov, kappa statistika, povprečna napaka, relativna napaka, število vseh primerkov) 
  * - Detailed Accuracy By Class (tu so natančnejši rezultati: Recall, Precision, MCC, ROC Area, PRC Area)*/
 
+System.out.println("** Rezultati  **");
+System.out.println(eval.toSummaryString());
+System.out.println(eval.toClassDetailsString());
 
 
-  
-  
-  
+
   
     
   
-    /** for serialization. */
-  private static final long serialVersionUID = -1068606253458807903L;
-//private Instances Instance0;
-
+    
+  
+    /** for serialization. */// za cross validation
   /**
    * Constructs an Poincare Distance object, Instances must be still set.
    */
@@ -197,15 +196,6 @@ public class PoincareDistance
 
 
 
-
-//poskusi s temle?????????????????  TA STVAR NE DELA-................
- // public double distance(Instance first, Instance second){
- 	//if (first.numValues() != second.numValues())
-	//	return Double.POSITIVE_INFINITY;
-	//else
- //	 return Math.log (1+(2*Math.pow(first-second,2)/((1-first*first)(1-second*second))+ Math.sqrt(Math.pow(1+(2*Math.pow(first-second,2)/((1-first*first)(1-second*second)),2))-1));
- // }
-
 public double dot(Instance inst){
  	int n = 0;
 	double sum=0;
@@ -240,31 +230,7 @@ public double distance(Instance first, Instance second, double cutOffValue,
 	
 	return Math.log( x + Math.sqrt( Math.pow(x, 2)-1) );
 }
-/*
-public double distance(Instance first, Instance second){
- 	//if (first.numValues() != second.numValues())
-	//	return Double.POSITIVE_INFINITY;
-	//else
-	
-	
-	int firstNumValues = first.numValues();
-    int secondNumValues = second.numValues();
-    
-	
-	double a;
-	double b;
-	double c;
-	double d;
-	int i = 1; // DODANO
-	a = 0; // DODANO
-	first.numValues();
-	a += Math.pow(first.value(i) - second.value(i),2);
-	b = 1- dot(first);
-	c = 1- dot(second);
-	d = 1+ (2*a/b*c);
- 	 return Math.log(d + Math.sqrt(Math.pow(d,2)-1));
-  }
-*/
+
 
   /**
 DODAJ ŠE NORMIRANJE: 
@@ -284,27 +250,7 @@ public double Norma(Instance instance)
 }
 
 
-//
-  private double norm(Instance first, Instance second)
-  {
-	int i;
-	double[] firstArr = first.toDoubleArray();
-	double[] secondArr = second.toDoubleArray();
-	double sum = 0;
-	double[] p_minus_q = new double[first.numValues()];
-	double ptq = 0; // $P^T \times Q$
-	for (i = 0; i < first.numValues(); i++) {
-		p_minus_q[i] = firstArr[i] - secondArr[i]; 
-		ptq = ptq + firstArr[i] * secondArr[i];
-	}
 
-	for (i = 0; i < first.numValues(); i++) {
-		sum = sum + Math.pow(p_minus_q[i]/(1 - ptq), 2);
-	}
-
-	return Math.sqrt(sum);
-  }
-  
   /**
    * Calculates the distance between two instances.
    * 
@@ -472,5 +418,14 @@ public double Norma(Instance instance)
    */
   public String getRevision() {
     return RevisionUtils.extract("$Revision: 0 $");
+  }
+
+
+
+
+
+
+
+
   }
 }
