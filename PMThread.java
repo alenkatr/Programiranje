@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.Scanner;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.util.concurrent.*;
 
 import weka.classifiers.Evaluation;
 import weka.classifiers.lazy.IBk;
@@ -17,23 +18,23 @@ import weka.filters.unsupervised.instance.imagefilter.*;
 
 
 public static class PoincareThread implements Runnable{
-    //array of size 10, Instance
-    int intArray [10];
+    //Instance, Thread
     private Insatance inst;
     private Thread t;
     
 
+    //create Instance
     public PoincareThread (Instance name){
-        //definition of what will instance do -------- crossvalid??
         this.inst = name;
 
     }
 
-
+@Override
 public void run(){
 
-    //thread starts
+    //print which thread starts
     System.out.println("Running " +  t);
+
     //read data + run crossvalidation + classifier + 
     //+ store classifier + appropriate of intArray[]
     //accept original dataset
@@ -63,24 +64,36 @@ public void run(){
         System.out.println("k = " +  k );
         }
 
-        //crossvalid.
+        //crossvalidation -- threads??
         Evaluation eval = new Evaluation(newData);
         eval.crossValidateModel(knn, newData, 10, new Random(1));
+        //Evaluation eval = new Evaluation(newData);
+        //myClassifier.buildClassifier(newData);
+        //for (int i = 0; i < testData.numInstances(); i++) {
+        //    eval.evaluateModelOnce(myClassifier, newData.instance(i)); OR need these metrics then call evaluateModelOnceAndRecordPrediction() 
+        //}
     }
+
 }
+
+    /**ExecutorService will take care of your threads and we will initialize the number of threads to be the number of cores that your CPU has available.
+     *  List<Future> will allow us to wait for all threads to finish before we continue with the main thread. 
+     * List<CVResult> is of course there to hold the results added by the threads  */
+
+	private static ExecutorService executor = null;
+	private static List<Future> futures = new ArrayList<>();	
+	private static List<CVResult> resultList = Collections.synchronizedList(new ArrayList<CVResult>());
+
 
 public class PMThread {
     public static void main (String args[]){
         //run threads + AggregateableEvaluation
-        //run PoincareThread!!
+        //run PoincareThread
         (new Thread(new PoincareThread())).start();
 
         //AggregateableEvaluation
         //agg = new weka.classifiers.evaluation.AggregateableEvaluation(eval);
         //agg.aggregate(eval);
-
-        //thread ends
-        System.out.println("End " +  t);
 
         //crate a file with results
         BufferedWriter writer = new BufferedWriter(new FileWriter("/home/alenkat/Documents/DataAnalysis/SlikeFilterRez/BPPthreads.txt"));
@@ -92,4 +105,6 @@ public class PMThread {
 		writer.close();
 		
     }
+
 }
+
